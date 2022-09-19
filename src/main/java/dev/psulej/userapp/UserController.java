@@ -1,28 +1,25 @@
 package dev.psulej.userapp;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.sql.*;
+import java.util.*;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
 @RestController
 public class UserController {
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private long idSequence = 1;
-    private final List<User> users;
-
-    public UserController() {
-        List<User> users = new ArrayList<>();
-        users.add(new User(idSequence++, "Jan", "Kowalski","jan32","jan32@yandex.com"));
-        users.add(new User(idSequence++, "Jacek", "Kowalski","jacusss","jacko2213w@wp.pl"));
-        users.add(new User(idSequence++, "Konwalia", "Kowalski","tesop","konwaliawalia@gmail.com"));
-        users.add(new User(idSequence++, "Pawel", "Rak","rakk","pawlopaulo@wp.pl"));
-        users.add(new User(idSequence++, "Krzysztof", "Kowal","cristopher","cristo@outlook.com"));
-        users.add(new User(idSequence++, "Zbigniew", "Jeden","zibi1337","zibijabadibi@gmail.com"));
-        users.add(new User(idSequence++, "Jan", "Konopnicki","jKonop2323","janekkonopnicki@gmail.com"));
-        this.users = users;
+    public UserController(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
@@ -30,42 +27,23 @@ public class UserController {
         @RequestParam(value = "firstName", required = false) String firstName,
         @RequestParam(value = "lastName", required = false) String lastName,
         @RequestParam(value = "sort", defaultValue = "id") String sort) {
-        List<User> filteredUsers = new ArrayList<>(users);
 
-        for (User user : users) {
-            if (firstName != null) {
-                if (!startsWithIgnoreCase(user.getFirstName(), firstName)) {
-                    filteredUsers.remove(user);
-                }
-            }
-            if (lastName != null) {
-                if (!startsWithIgnoreCase(user.getLastName(), lastName)) {
-                    filteredUsers.remove(user);
-                }
-            }
-        }
+        String sql = "SELECT id, first_name, last_name FROM users ORDER BY id";
+        Map<String, Object> parameters = new HashMap<>();
 
-        filteredUsers.sort(new Comparator<User>() {
+        RowMapper<BasicUser> rowMapper = new RowMapper<>() {
             @Override
-            public int compare(User o1, User o2) {
-                if (sort.equalsIgnoreCase("firstName")) {
-                    return o1.firstName.compareToIgnoreCase(o2.firstName);
-                } else if (sort.equalsIgnoreCase("lastName")) {
-                    return o1.lastName.compareToIgnoreCase(o2.lastName);
-                } else if (sort.equalsIgnoreCase("id")) {
-                    return o1.id.compareTo(o2.id);
-                } else {
-                    throw new IllegalArgumentException("Unrecognized parameter: " + sort);
-                }
-            }
-        });
+            public BasicUser mapRow(ResultSet rs, int rowNum) throws SQLException {
+                long id = rs.getLong("id");
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
 
-        List<BasicUser> basicUsers = new ArrayList<>();
-        for (User user : filteredUsers) {
-            BasicUser basicUser = new BasicUser(user.getId(), user.getFirstName(), user.getLastName());
-            basicUsers.add(basicUser);
-        }
-        return basicUsers;
+                return new BasicUser(id, firstName, lastName);
+            }
+        };
+        return jdbcTemplate.query(
+                sql, parameters, rowMapper
+        );
     }
 
     private boolean startsWithIgnoreCase(String str1, String str2) {
@@ -74,42 +52,51 @@ public class UserController {
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     public User getUser(@PathVariable long id) {
-        for (User user : users) {
-            if (user.id == id) {
-                return user;
-            }
-        }
-        throw new UserNotFoundException();
+        // TODO: Implement
+        return null;
     }
 
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public User createUser(@RequestBody User newUser) {
-        newUser.id = idSequence++;
-        users.add(newUser);
-        return newUser;
+        String sql = "INSERT INTO users(id, first_name, last_name) VALUES (nextval('users_seq'), :firstName, :lastName)";
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("firstName", newUser.firstName);
+        parameters.put("lastName", newUser.lastName);
+        KeyHolder key = new GeneratedKeyHolder();
+        jdbcTemplate.update(sql, new MapSqlParameterSource(parameters), key, new String[] { "id" });
+
+        return new User(
+                key.getKey().longValue(),
+                newUser.firstName,
+                newUser.lastName,
+                "not-set",
+                "not-set"
+        );
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
     public User updateUser(@PathVariable long id, @RequestBody User existingUser) {
-        for(User user : this.users){
-            if(user.id == id){
-                user.firstName = existingUser.getFirstName();
-                user.lastName = existingUser.getLastName();
-                return user;
-            }
-        }
-
-        throw new UserNotFoundException();
+        String sql = "UPDATE users SET first_name = :firstName, last_name = :lastName WHERE id = :id";
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("firstName", existingUser.firstName);
+        parameters.put("lastName", existingUser.lastName);
+        parameters.put("id",id);
+        jdbcTemplate.update(sql, new MapSqlParameterSource(parameters));
+        return new User(
+                id,
+                existingUser.firstName,
+                existingUser.lastName,
+                "not-set",
+                "not-set"
+        );
     }
 
     @RequestMapping(value = "/users/{id}" , method = RequestMethod.DELETE)
     public void deleteUser(@PathVariable long id){
-        List<User> usersCopy = new ArrayList<>(this.users);
-        for(User user : usersCopy){
-            if(user.id == id){
-                this.users.remove(user);
-            }
-        }
+        String sql = "DELETE FROM users WHERE id = :id";
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("id",id);
+        jdbcTemplate.update(sql, new MapSqlParameterSource(parameters));
     }
 }

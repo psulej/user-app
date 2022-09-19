@@ -45,12 +45,13 @@ function updateUser (userId) {
     body: JSON.stringify({firstName : newFirstName, lastName : newLastName })
   })
 
-  .then(() => {
-
-    const row = document.getElementById(`user-${userId}`)
-
-    row.querySelector('.firstName').innerHTML = newFirstName
-    row.querySelector('.lastName').innerHTML = newLastName
+  .then(res => {
+    console.log(res)
+    if(res.ok) {
+      const row = document.getElementById(`user-${userId}`)
+      row.querySelector('.firstName').innerHTML = newFirstName
+      row.querySelector('.lastName').innerHTML = newLastName
+    }
   })
 }
 
