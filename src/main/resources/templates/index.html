@@ -11,18 +11,35 @@
         <h1>Add user to the list</h1>
         <table class="addUserTable">
           <tbody id="addUserBody">
+
           <tr>
             <td class="userDataField" >Name: </td>
             <td class="inputField">
               <input class="userDataInput" required id="name" type="text">
             </td>
           </tr>
+
           <tr>
-            <td class="userDataField" >Second name: </td>
+            <td class="userDataField" >Last name: </td>
             <td class="inputField">
-              <input class="userDataInput" required id="secondName" type="text">
+              <input class="userDataInput" required id="lastName" type="text">
             </td>
           </tr>
+
+          <tr>
+            <td class="userDataField" >Login: </td>
+            <td class="inputField">
+              <input class="userDataInput" required id="login" type="text">
+            </td>
+          </tr>
+
+          <tr>
+            <td class="userDataField" >Email: </td>
+            <td class="inputField">
+              <input class="userDataInput" required id="email" type="text">
+            </td>
+          </tr>
+
           <tr>
             <td colspan="2" style="width:40%; font-size: 40px; text-align: center; height: 90px"><button onclick="addUser()" id="addUserButton">Click to add</button></td>
           </tr>
@@ -30,7 +47,7 @@
         </table>
     </div>
 
-    <div style="padding-top 40px;">
+    <div style="padding-top: 40px;">
       <h1>List of users</h1>
     </div>
     <table id="usersTable">
@@ -40,18 +57,35 @@
 
     </table>
 
-    <!-- The form -->
-    <div class="form-popup" id="myForm">
+    <!-- Update popup -->
+    <div class="form-popup" id="updateForm">
       <div class="form-container">
 
         <label class="formInput" for="name"><b>Name:</b></label>
         <input type="text" placeholder="Enter name" name="name" id="newFirstName">
 
-        <label class="formInput" for="secondName"><b>Second name:</b></label>
-        <input type="text" placeholder="Enter second name" name="secondName" id="newLastName">
+        <label class="formInput" for="lastName"><b>Last name:</b></label>
+        <input type="text" placeholder="Enter second name" name="lastName" id="newLastName">
+
+        <label class="formInput"><b>Login:</b></label>
+        <label for="newLogin"></label><input type="text" placeholder="Enter login" name="name" id="newLogin">
+
+        <label class="formInput"><b>Email:</b></label>
+        <label for="newEmail"></label><input type="text" placeholder="Enter second name" name="lastName" id="newEmail">
 
         <button type="submit" class="btn">Edit</button>
-        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+        <button type="button" class="btn cancel" onclick="closeForm('updateForm')">Close</button>
+      </div>
+    </div>
+
+    <div class="form-popup" id="infoForm">
+      <div class="form-container">
+        <label class="formInput"><b>Login:</b></label>
+        <label for="newLogin"></label><input disabled type="text" placeholder="Enter login" name="name" id="infoLogin">
+
+        <label class="formInput"><b>Email:</b></label>
+        <label for="newEmail"></label><input disabled type="text" placeholder="Enter second name" name="lastName" id="infoEmail">
+        <button type="button" class="btn cancel" onclick="closeForm('infoForm')">Close</button>
       </div>
     </div>
   </body>

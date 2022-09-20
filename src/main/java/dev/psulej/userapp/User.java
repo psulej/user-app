@@ -1,19 +1,21 @@
 package dev.psulej.userapp;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class User {
 
     Long id;
     String firstName;
     String lastName;
     String login;
-    String mail;
+    String email;
 
-    public User(Long id, String firstName, String lastName, String login, String mail) {
+    public User(Long id, String firstName, String lastName, String login, String email) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.login = login;
-        this.mail = mail;
+        this.email = email;
     }
 
     public String getFirstName() {
@@ -32,7 +34,7 @@ public class User {
         return login;
     }
 
-    public String getMail() {
-        return mail;
+    public String getEmail() {
+        return email;
     }
 }

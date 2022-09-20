@@ -28,7 +28,7 @@ public class UserController {
         @RequestParam(value = "lastName", required = false) String lastName,
         @RequestParam(value = "sort", defaultValue = "id") String sort) {
 
-        String sql = "SELECT id, first_name, last_name FROM users ORDER BY id";
+        String sql = "SELECT id, first_name, last_name, login, email FROM users ORDER BY id";
         Map<String, Object> parameters = new HashMap<>();
 
         RowMapper<BasicUser> rowMapper = new RowMapper<>() {
@@ -37,7 +37,6 @@ public class UserController {
                 long id = rs.getLong("id");
                 String firstName = rs.getString("first_name");
                 String lastName = rs.getString("last_name");
-
                 return new BasicUser(id, firstName, lastName);
             }
         };
@@ -46,23 +45,41 @@ public class UserController {
         );
     }
 
-    private boolean startsWithIgnoreCase(String str1, String str2) {
-        return str1.toUpperCase().startsWith(str2.toUpperCase());
-    }
-
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     public User getUser(@PathVariable long id) {
         // TODO: Implement
-        return null;
+        String sql = "SELECT id, first_name, last_name, login, email FROM users WHERE id = :id";
+
+        Map<String,Object> parameters = new HashMap<>();
+        parameters.put("id",id);
+
+        RowMapper<User> userRowMapper = new RowMapper<User>() {
+            @Override
+            public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+                long id = rs.getLong("id");
+                String firstName = rs.getString("first_name");
+                String lastName = rs.getString("last_name");
+                String login = rs.getString("login");
+                String email = rs.getString("email");
+                return new User(id,firstName,lastName,login,email);
+            }
+        };
+
+        User user = jdbcTemplate.queryForObject(sql, parameters, userRowMapper);
+        return user;
     }
 
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public User createUser(@RequestBody User newUser) {
-        String sql = "INSERT INTO users(id, first_name, last_name) VALUES (nextval('users_seq'), :firstName, :lastName)";
+        String sql = "INSERT INTO users(id, first_name, last_name, login, email)" +
+                " VALUES (nextval('users_seq'), :firstName, :lastName, :login, :email)";
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("firstName", newUser.firstName);
         parameters.put("lastName", newUser.lastName);
+        parameters.put("login" , newUser.login);
+        parameters.put("email" , newUser.email);
+
         KeyHolder key = new GeneratedKeyHolder();
         jdbcTemplate.update(sql, new MapSqlParameterSource(parameters), key, new String[] { "id" });
 
@@ -70,25 +87,27 @@ public class UserController {
                 key.getKey().longValue(),
                 newUser.firstName,
                 newUser.lastName,
-                "not-set",
-                "not-set"
+                newUser.login,
+                newUser.email
         );
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
     public User updateUser(@PathVariable long id, @RequestBody User existingUser) {
-        String sql = "UPDATE users SET first_name = :firstName, last_name = :lastName WHERE id = :id";
+        String sql = "UPDATE users SET first_name = :firstName, last_name = :lastName, login = :login, email = :email WHERE id = :id";
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("firstName", existingUser.firstName);
         parameters.put("lastName", existingUser.lastName);
         parameters.put("id",id);
+        parameters.put("email", existingUser.email);
+        parameters.put("login", existingUser.login);
         jdbcTemplate.update(sql, new MapSqlParameterSource(parameters));
         return new User(
                 id,
                 existingUser.firstName,
                 existingUser.lastName,
-                "not-set",
-                "not-set"
+                existingUser.login,
+                existingUser.email
         );
     }
 

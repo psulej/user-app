@@ -21,7 +21,6 @@ public class BasicUser {
         return lastName;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() {return id;}
+
 }
