@@ -4,9 +4,11 @@ table,th,td {
 
 body {
     text-align: center;
-    border: 3px solid black;
+    border: 3px solid white;
     margin: 15px;
     padding: 10px;
+    background-color: rgb(51,51,51);
+    color: white;
 }
 
 input[type='text'] { font-size: 24px; }
@@ -106,7 +108,7 @@ input[type='text'] { font-size: 24px; }
 .form-container {
   max-width: 300px;
   padding: 10px;
-  background-color: white;
+  background-color: gray;
 }
 
 /* Full-width input fields */

@@ -47,7 +47,6 @@ public class UserController {
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     public User getUser(@PathVariable long id) {
-        // TODO: Implement
         String sql = "SELECT id, first_name, last_name, login, email FROM users WHERE id = :id";
 
         Map<String,Object> parameters = new HashMap<>();
