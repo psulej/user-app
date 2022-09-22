@@ -8,7 +8,7 @@
   <body>
     <div id="users"></div>
     <div id="addUser">
-        <h1>Add user to the list</h1>
+        <h1>Register user</h1>
         <table class="addUserTable">
           <tbody id="addUserBody">
 
@@ -41,6 +41,42 @@
           </tr>
 
           <tr>
+            <td class="userDataField" >Country: </td>
+            <td class="inputField">
+              <input class="userDataInput" required id="country" type="text">
+            </td>
+          </tr>
+
+          <tr>
+            <td class="userDataField" >City: </td>
+            <td class="inputField">
+              <input class="userDataInput" required id="city" type="text">
+            </td>
+          </tr>
+
+          <tr>
+            <td class="userDataField" >Street: </td>
+            <td class="inputField">
+              <input class="userDataInput" required id="street" type="text">
+            </td>
+          </tr>
+
+          <tr>
+            <td class="userDataField" >House number: </td>
+            <td class="inputField">
+              <input class="userDataInput" required id="houseNumber" type="text">
+            </td>
+          </tr>
+
+          <tr>
+            <td class="userDataField" >Zip code: </td>
+            <td class="inputField">
+              <input class="userDataInput" required id="zipCode" type="text">
+            </td>
+          </tr>
+
+
+          <tr>
             <td colspan="2" style="width:40%; font-size: 40px; text-align: center; height: 90px"><button onclick="addUser()" id="addUserButton">Click to add</button></td>
           </tr>
         </tbody>
@@ -48,7 +84,7 @@
     </div>
 
     <div style="padding-top: 40px;">
-      <h1>List of users</h1>
+      <h1>Registered users</h1>
     </div>
     <table id="usersTable">
 

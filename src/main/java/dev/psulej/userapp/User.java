@@ -9,13 +9,15 @@ public class User {
     String lastName;
     String login;
     String email;
+    Address address;
 
-    public User(Long id, String firstName, String lastName, String login, String email) {
+    public User(Long id, String firstName, String lastName, String login, String email, Address address) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.login = login;
         this.email = email;
+        this.address = address;
     }
 
     public String getFirstName() {

@@ -117,8 +117,13 @@ const userName = document.getElementById("name");
 const userLastName = document.getElementById("lastName");
 const userLogin = document.getElementById("login");
 const userEmail = document.getElementById("email");
+const userCountry = document.getElementById("country");
+const userCity = document.getElementById("city");
+const userStreet = document.getElementById("street");
+const userHouseNumber = document.getElementById("houseNumber");
+const userZipCode = document.getElementById("zipCode");
 
-fetch(`http://localhost:9000/users`, {
+fetch(`http://localhost:9000/users`,{
   method: 'POST',
   headers: {
     'Content-Type': 'application/json'
@@ -127,7 +132,14 @@ fetch(`http://localhost:9000/users`, {
     firstName : userName.value,
     lastName : userLastName.value,
     login : userLogin.value,
-    email : userEmail.value
+    email : userEmail.value,
+    address: {
+        country : userCountry.value,
+        city : userCity.value,
+        street : userStreet.value,
+        houseNumber : userHouseNumber.value,
+        zipCode : userZipCode.value
+    }
   })
 })
 .then(res => res.json())

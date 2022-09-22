@@ -4,11 +4,9 @@ import java.sql.*;
 import java.util.*;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 @RestController
 public class UserController {
+
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public UserController(NamedParameterJdbcTemplate jdbcTemplate) {
@@ -60,7 +59,7 @@ public class UserController {
                 String lastName = rs.getString("last_name");
                 String login = rs.getString("login");
                 String email = rs.getString("email");
-                return new User(id,firstName,lastName,login,email);
+                return new User(id,firstName,lastName,login,email,null);
             }
         };
 
@@ -71,24 +70,44 @@ public class UserController {
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public User createUser(@RequestBody User newUser) {
-        String sql = "INSERT INTO users(id, first_name, last_name, login, email)" +
+        long userId = insertUser(newUser);
+        String sql = "INSERT INTO user_addresses(user_id, country, city, street, house_number, zip_code) " +
+                "VALUES(:id, :country, :city, :street, :houseNumber, :zipCode)";
+        HashMap<String, Object> parameters = new HashMap<>();
+
+        parameters.put("id",userId);
+        Address address = newUser.address;
+        parameters.put("country", address.country);
+        parameters.put("city", address.city);
+        parameters.put("street", address.street);
+        parameters.put("houseNumber", address.houseNumber);
+        parameters.put("zipCode", address.zipCode);
+
+        jdbcTemplate.update(sql, parameters);
+
+        return new User(
+                userId,
+                newUser.firstName,
+                newUser.lastName,
+                newUser.login,
+                newUser.email,
+                address
+        );
+    }
+
+    private long insertUser(User newUser) {
+        String sql =
+                "INSERT INTO users(id, first_name, last_name, login, email)" +
                 " VALUES (nextval('users_seq'), :firstName, :lastName, :login, :email)";
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("firstName", newUser.firstName);
         parameters.put("lastName", newUser.lastName);
         parameters.put("login" , newUser.login);
         parameters.put("email" , newUser.email);
-
-        KeyHolder key = new GeneratedKeyHolder();
+        KeyHolder key = new GeneratedKeyHolder(); // zwraca id dla usera
         jdbcTemplate.update(sql, new MapSqlParameterSource(parameters), key, new String[] { "id" });
-
-        return new User(
-                key.getKey().longValue(),
-                newUser.firstName,
-                newUser.lastName,
-                newUser.login,
-                newUser.email
-        );
+        long userId = key.getKey().longValue();
+        return userId;
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
@@ -106,15 +125,28 @@ public class UserController {
                 existingUser.firstName,
                 existingUser.lastName,
                 existingUser.login,
-                existingUser.email
+                existingUser.email,
+                null
         );
     }
 
     @RequestMapping(value = "/users/{id}" , method = RequestMethod.DELETE)
     public void deleteUser(@PathVariable long id){
+        deleteUserAddresses(id);
+        deleteUsers(id);
+    }
+
+    private void deleteUserAddresses(long id) {
+        String sql = "DELETE FROM user_addresses WHERE user_id = :userId";
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("userId", id);
+        jdbcTemplate.update(sql, parameters);
+    }
+
+    private void deleteUsers(long id) {
         String sql = "DELETE FROM users WHERE id = :id";
         HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put("id",id);
-        jdbcTemplate.update(sql, new MapSqlParameterSource(parameters));
+        parameters.put("id", id);
+        jdbcTemplate.update(sql, parameters);
     }
 }
