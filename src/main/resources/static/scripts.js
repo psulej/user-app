@@ -59,13 +59,21 @@ function updateUser(userId) {
             firstName: newFirstName,
             lastName: newLastName,
             login: newLogin,
-            email: newEmail
+            email: newEmail,
+            address: {
+                country: newCountry,
+                city: newCity,
+                street: newStreet,
+                houseNumber: newHouseNumber,
+                zipCode: newZipCode
+            }
         })
     })
 
         .then(res => {
             console.log(res)
             if (res.ok) {
+                // wyswietlanie w tabelcejnkbkjnkhjjbmmjnhbvnb
                 const row = document.getElementById(`user-${userId}`)
                 row.querySelector('.firstName').innerHTML = newFirstName
                 row.querySelector('.lastName').innerHTML = newLastName
@@ -90,6 +98,7 @@ function openForm(userId) {
             updateUserForm.querySelector('#newLastName').value = res.lastName
             updateUserForm.querySelector('#newLogin').value = res.login
             updateUserForm.querySelector('#newEmail').value = res.email
+            //updateUserForm.querySelector('#newCountry').value = res.address.country
             updateUserForm.style.display = "block"
             const submitButton = updateUserForm.querySelector('button[type="submit"]')
             submitButton.addEventListener("click", function() {

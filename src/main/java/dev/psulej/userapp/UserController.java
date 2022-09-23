@@ -3,7 +3,6 @@ package dev.psulej.userapp;
 import java.sql.*;
 import java.util.*;
 
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -65,8 +64,10 @@ public class UserController {
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
     public User getUser(@PathVariable long id) {
-        String sql = "SELECT id, first_name, last_name, login, email FROM users WHERE id = :id";
-
+        String sql = "SELECT u.id, u.first_name, u.last_name, u.login, u.email, ua.country, ua.city, ua.street, ua.house_number, ua.zip_code " +
+                "FROM users u " +
+                "JOIN user_addresses ua on u.id = ua.user_id " +
+                "WHERE id = :id";
         Map<String,Object> parameters = new HashMap<>();
         parameters.put("id",id);
 
@@ -78,7 +79,14 @@ public class UserController {
                 String lastName = rs.getString("last_name");
                 String login = rs.getString("login");
                 String email = rs.getString("email");
-                return new User(id,firstName,lastName,login,email,null);
+                String country = rs.getString("country");
+                String city = rs.getString("city");
+                String street = rs.getString("street");
+                String houseNumber = rs.getString("house_number");
+                String zipCode = rs.getString("zip_code");
+
+                Address address = new Address(country,city,street,houseNumber,zipCode);
+                return new User(id,firstName,lastName,login,email,address);
             }
         };
 
@@ -131,22 +139,38 @@ public class UserController {
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
     public User updateUser(@PathVariable long id, @RequestBody User existingUser) {
-        String sql = "UPDATE users SET first_name = :firstName, last_name = :lastName, login = :login, email = :email WHERE id = :id";
+        long userId = setUser(id, existingUser);
+        String sql = "UPDATE user_addresses SET country = :country, city = :city, street = :street, house_number = :houseNumber, zip_code = :zipCode WHERE user_id = :id";
         HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put("firstName", existingUser.firstName);
-        parameters.put("lastName", existingUser.lastName);
-        parameters.put("id",id);
-        parameters.put("email", existingUser.email);
-        parameters.put("login", existingUser.login);
-        jdbcTemplate.update(sql, new MapSqlParameterSource(parameters));
+        Address address = existingUser.address;
+        parameters.put("id",userId);
+        parameters.put("country",existingUser.address.country);
+        parameters.put("city",existingUser.address.city);
+        parameters.put("street",existingUser.address.street);
+        parameters.put("houseNumber",existingUser.address.houseNumber);
+        parameters.put("zipCode",existingUser.address.zipCode);
+        jdbcTemplate.update(sql, parameters);
         return new User(
                 id,
                 existingUser.firstName,
                 existingUser.lastName,
                 existingUser.login,
                 existingUser.email,
-                null
+                existingUser.address
         );
+    }
+
+    private long setUser(long id, User existingUser) {
+        String sql = "UPDATE users SET first_name = :firstName, last_name = :lastName, login = :login, email = :email WHERE id = :id";
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("firstName", existingUser.firstName);
+        parameters.put("lastName", existingUser.lastName);
+        parameters.put("id", id);
+        parameters.put("email", existingUser.email);
+        parameters.put("login", existingUser.login);
+        KeyHolder key = new GeneratedKeyHolder();
+        jdbcTemplate.update(sql, new MapSqlParameterSource(parameters), key, new String[] { "id" });
+        return key.getKey().longValue();
     }
 
     @RequestMapping(value = "/users/{id}" , method = RequestMethod.DELETE)

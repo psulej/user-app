@@ -39,4 +39,9 @@ public class User {
     public String getEmail() {
         return email;
     }
+
+    public Address getAddress() {
+        return address;
+    }
 }
+
