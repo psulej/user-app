@@ -11,7 +11,7 @@ body {
     color: white;
 }
 
-input[type='text'] { font-size: 24px; }
+input[type='text'] { font-size: 15px; }
 
 :root {
   color-scheme: light dark; /* both supported */
@@ -36,7 +36,7 @@ input[type='text'] { font-size: 24px; }
 
 .inputField {
  width:40%;
- font-size: 10px;
+ font-size: 12px;
  text-align: center;
 }
 
@@ -75,7 +75,7 @@ input[type='text'] { font-size: 24px; }
 }
 
 .formInput{
-    font-size: 30px;
+    font-size: 20px;
 }
 
 {box-sizing: border-box;}
@@ -114,8 +114,8 @@ input[type='text'] { font-size: 24px; }
 /* Full-width input fields */
 .form-container input[type=text], .form-container input[type=password] {
   width: 100%;
-  padding: 15px;
-  margin: 5px 0 22px 0;
+  padding: 10px;
+  margin: 5px 0 15px 0;
   border: none;
   background: #f1f1f1;
 }
@@ -130,17 +130,17 @@ input[type='text'] { font-size: 24px; }
 .form-container .btn {
   background-color: #04AA6D;
   color: white;
-  padding: 16px 20px;
+  padding: 12px 15px;
   border: none;
   cursor: pointer;
   width: 100%;
   margin-bottom:10px;
   opacity: 0.8;
-  font-size: 20px;
+  font-size: 14px;
 }
 
 /* Add a red background color to the cancel button */
-.cancel {
+.btn.cancel {
   background-color: red;
 }
 

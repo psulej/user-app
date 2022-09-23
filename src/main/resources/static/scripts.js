@@ -1,21 +1,21 @@
 fetch('http://localhost:9000/users')
-.then(res => res.json())
-.then(users => {
-  let tableHtml = ''
+    .then(res => res.json())
+    .then(users => {
+        let tableHtml = ''
 
-  for (let index in users) {
-      const user = users[index]
-      tableHtml += userRow(user)
-  }
+        for (let index in users) {
+            const user = users[index]
+            tableHtml += userRow(user)
+        }
 
-  document.getElementById('usersBody').innerHTML = tableHtml
-})
+        document.getElementById('usersBody').innerHTML = tableHtml
+    })
 
-function userRow(user){
+function userRow(user) {
 
-const userId = user.id
+    const userId = user.id
 
-const tr = `<tr id="user-${userId}">
+    const tr = `<tr id="user-${userId}">
   <td>${userId}</td><td class="firstName">${user.firstName}</td>
   <td class="lastName">${user.lastName}</td>
   <td style="width: 25px; height: 25px padding: 5px;"><button onclick="infoForm(${userId})" id="update" type="button">\u2139</button></td>
@@ -24,67 +24,80 @@ const tr = `<tr id="user-${userId}">
   deleteUser(${userId})" id="delete" type="button"> \u2718 </button></td>
 </tr>`
 
-return tr
+    return tr
 }
 
-function deleteUser (userId){
+function deleteUser(userId) {
 
-fetch(`http://localhost:9000/users/${userId}`, { method: 'DELETE' })
-.then(() => {
-  let row = document.getElementById(`user-${userId}`)
-  row.remove();
-})
+    fetch(`http://localhost:9000/users/${userId}`, {
+        method: 'DELETE'
+    })
+        .then(() => {
+            let row = document.getElementById(`user-${userId}`)
+            row.remove();
+        })
 }
 
-function updateUser (userId) {
+function updateUser(userId) {
 
-  const newFirstName = document.getElementById('newFirstName').value
-  const newLastName = document.getElementById('newLastName').value
-  const newEmail = document.getElementById('newEmail').value
-  const newLogin = document.getElementById('newLogin').value
+    const newFirstName = document.getElementById('newFirstName').value
+    const newLastName = document.getElementById('newLastName').value
+    const newEmail = document.getElementById('newEmail').value
+    const newLogin = document.getElementById('newLogin').value
+    const newCountry = document.getElementById('newCountry').value
+    const newCity = document.getElementById('newCity').value
+    const newStreet = document.getElementById('newStreet').value
+    const newHouseNumber = document.getElementById('newHouseNumber').value
+    const newZipCode = document.getElementById('newZipCode').value
 
-  fetch(`http://localhost:9000/users/${userId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({firstName : newFirstName, lastName : newLastName, login : newLogin, email : newEmail })
-  })
+    fetch(`http://localhost:9000/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            firstName: newFirstName,
+            lastName: newLastName,
+            login: newLogin,
+            email: newEmail
+        })
+    })
 
-  .then(res => {
-    console.log(res)
-    if(res.ok) {
-      const row = document.getElementById(`user-${userId}`)
-      row.querySelector('.firstName').innerHTML = newFirstName
-      row.querySelector('.lastName').innerHTML = newLastName
-    }
-  })
+        .then(res => {
+            console.log(res)
+            if (res.ok) {
+                const row = document.getElementById(`user-${userId}`)
+                row.querySelector('.firstName').innerHTML = newFirstName
+                row.querySelector('.lastName').innerHTML = newLastName
+            }
+        })
 }
 
 function openForm(userId) {
 
-  fetch(`http://localhost:9000/users/${userId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-  })
-      .then(res => res.json())
-      .then(res => {
-          // response = { id, firstName, lastName, login, email }
-          const updateUserForm = document.getElementById("updateForm");
-          const row = document.getElementById(`user-${userId}`)
-          updateUserForm.querySelector('#newFirstName').value = res.firstName
-          updateUserForm.querySelector('#newLastName').value = res.lastName
-          updateUserForm.querySelector('#newLogin').value = res.login
-          updateUserForm.querySelector('#newEmail').value = res.email
-          updateUserForm.style.display = "block"
-          const submitButton = updateUserForm.querySelector('button[type="submit"]')
-          submitButton.addEventListener("click", function () {console.log('test')
+    fetch(`http://localhost:9000/users/${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+        .then(res => res.json())
+        .then(res => {
+            // response = { id, firstName, lastName, login, email }
+            const updateUserForm = document.getElementById("updateForm");
+            const row = document.getElementById(`user-${userId}`)
+            updateUserForm.querySelector('#newFirstName').value = res.firstName
+            updateUserForm.querySelector('#newLastName').value = res.lastName
+            updateUserForm.querySelector('#newLogin').value = res.login
+            updateUserForm.querySelector('#newEmail').value = res.email
+            updateUserForm.style.display = "block"
+            const submitButton = updateUserForm.querySelector('button[type="submit"]')
+            submitButton.addEventListener("click", function() {
+                console.log('test')
 
-            updateUser(userId)
-          })
-      })
+                updateUser(userId)
+            })
+        })
 }
 
 function infoForm(userId) {
@@ -102,50 +115,51 @@ function infoForm(userId) {
             document.getElementById('infoEmail').defaultValue = res.email
             infoUserForm.style.display = "block"
             const submitButton = infoUserForm.querySelector('button[type="submit"]')
-            submitButton.addEventListener("click", function () {console.log('test')
+            submitButton.addEventListener("click", function() {
+                console.log('test')
 
             })
         })
 }
 
 function closeForm(form) {
-  document.getElementById(form).style.display = "none";
+    document.getElementById(form).style.display = "none";
 }
 
-function addUser(){
-const userName = document.getElementById("name");
-const userLastName = document.getElementById("lastName");
-const userLogin = document.getElementById("login");
-const userEmail = document.getElementById("email");
-const userCountry = document.getElementById("country");
-const userCity = document.getElementById("city");
-const userStreet = document.getElementById("street");
-const userHouseNumber = document.getElementById("houseNumber");
-const userZipCode = document.getElementById("zipCode");
+function addUser() {
+    const userName = document.getElementById("name");
+    const userLastName = document.getElementById("lastName");
+    const userLogin = document.getElementById("login");
+    const userEmail = document.getElementById("email");
+    const userCountry = document.getElementById("country");
+    const userCity = document.getElementById("city");
+    const userStreet = document.getElementById("street");
+    const userHouseNumber = document.getElementById("houseNumber");
+    const userZipCode = document.getElementById("zipCode");
 
-fetch(`http://localhost:9000/users`,{
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    firstName : userName.value,
-    lastName : userLastName.value,
-    login : userLogin.value,
-    email : userEmail.value,
-    address: {
-        country : userCountry.value,
-        city : userCity.value,
-        street : userStreet.value,
-        houseNumber : userHouseNumber.value,
-        zipCode : userZipCode.value
-    }
-  })
-})
-.then(res => res.json())
-.then(user => {
-let userTableBodyElement = document.getElementById('usersBody')
-let tableHtml = userTableBodyElement.innerHTML + userRow(user)
-userTableBodyElement.innerHTML = tableHtml
-})
+    fetch(`http://localhost:9000/users`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            firstName: userName.value,
+            lastName: userLastName.value,
+            login: userLogin.value,
+            email: userEmail.value,
+            address: {
+                country: userCountry.value,
+                city: userCity.value,
+                street: userStreet.value,
+                houseNumber: userHouseNumber.value,
+                zipCode: userZipCode.value
+            }
+        })
+    })
+        .then(res => res.json())
+        .then(user => {
+            let userTableBodyElement = document.getElementById('usersBody')
+            let tableHtml = userTableBodyElement.innerHTML + userRow(user)
+            userTableBodyElement.innerHTML = tableHtml
+        })
 }

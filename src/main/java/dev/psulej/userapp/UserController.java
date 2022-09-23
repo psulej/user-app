@@ -27,8 +27,27 @@ public class UserController {
         @RequestParam(value = "lastName", required = false) String lastName,
         @RequestParam(value = "sort", defaultValue = "id") String sort) {
 
-        String sql = "SELECT id, first_name, last_name, login, email FROM users ORDER BY id";
+        String sql = "SELECT id, first_name, last_name, login, email FROM users WHERE 1 = 1";
         Map<String, Object> parameters = new HashMap<>();
+
+        if (firstName != null) {
+            sql += " AND lower(first_name) LIKE lower(:firstName)";
+            parameters.put("firstName", firstName + '%');
+        }
+        if (lastName != null) {
+            sql += " AND lower(last_name) LIKE lower(:lastName)";
+            parameters.put("lastName", lastName + '%');
+        }
+
+        Map<String, String> orderByColumns = new HashMap<>();
+        orderByColumns.put("id", "id");
+        orderByColumns.put("firstName", "first_name");
+        orderByColumns.put("lastName", "last_name");
+        orderByColumns.put("email", "email");
+        orderByColumns.put("login", "login");
+
+        String sortColumnName = orderByColumns.getOrDefault(sort, "id");
+        sql += " ORDER BY " + sortColumnName;
 
         RowMapper<BasicUser> rowMapper = new RowMapper<>() {
             @Override
