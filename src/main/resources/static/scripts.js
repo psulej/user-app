@@ -39,7 +39,6 @@ function deleteUser(userId) {
 }
 
 function updateUser(userId) {
-
     const newFirstName = document.getElementById('newFirstName').value
     const newLastName = document.getElementById('newLastName').value
     const newEmail = document.getElementById('newEmail').value
@@ -73,7 +72,7 @@ function updateUser(userId) {
         .then(res => {
             console.log(res)
             if (res.ok) {
-                // wyswietlanie w tabelcejnkbkjnkhjjbmmjnhbvnb
+                // wyswietlanie w tabelce
                 const row = document.getElementById(`user-${userId}`)
                 row.querySelector('.firstName').innerHTML = newFirstName
                 row.querySelector('.lastName').innerHTML = newLastName
@@ -91,19 +90,22 @@ function openForm(userId) {
     })
         .then(res => res.json())
         .then(res => {
-            // response = { id, firstName, lastName, login, email }
+            // response = { id, firstName, lastName, login, email, address }
             const updateUserForm = document.getElementById("updateForm");
             const row = document.getElementById(`user-${userId}`)
+            //wyswietlanie value w formie
             updateUserForm.querySelector('#newFirstName').value = res.firstName
             updateUserForm.querySelector('#newLastName').value = res.lastName
             updateUserForm.querySelector('#newLogin').value = res.login
             updateUserForm.querySelector('#newEmail').value = res.email
-            //updateUserForm.querySelector('#newCountry').value = res.address.country
+            updateUserForm.querySelector('#newCountry').value = res.address.country
+            updateUserForm.querySelector('#newCity').value = res.address.city
+            updateUserForm.querySelector('#newStreet').value = res.address.street
+            updateUserForm.querySelector('#newHouseNumber').value = res.address.houseNumber
+            updateUserForm.querySelector('#newZipCode').value = res.address.zipCode
             updateUserForm.style.display = "block"
             const submitButton = updateUserForm.querySelector('button[type="submit"]')
             submitButton.addEventListener("click", function() {
-                console.log('test')
-
                 updateUser(userId)
             })
         })
@@ -122,12 +124,14 @@ function infoForm(userId) {
             const infoUserForm = document.getElementById("infoForm");
             document.getElementById('infoLogin').defaultValue = res.login
             document.getElementById('infoEmail').defaultValue = res.email
+            document.getElementById('infoCountry').defaultValue = res.address.country
+            document.getElementById('infoCity').defaultValue = res.address.city
+            document.getElementById('infoStreet').defaultValue = res.address.street
+            document.getElementById('infoHouseNumber').defaultValue = res.address.houseNumber
+            document.getElementById('infoZipCode').defaultValue = res.address.zipCode
+
             infoUserForm.style.display = "block"
             const submitButton = infoUserForm.querySelector('button[type="submit"]')
-            submitButton.addEventListener("click", function() {
-                console.log('test')
-
-            })
         })
 }
 
