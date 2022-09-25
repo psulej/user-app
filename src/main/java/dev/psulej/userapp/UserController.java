@@ -3,6 +3,9 @@ package dev.psulej.userapp;
 import java.sql.*;
 import java.util.*;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -63,7 +66,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
-    public User getUser(@PathVariable long id) {
+    public User getUser(@PathVariable long id) {;
         String sql = "SELECT u.id, u.first_name, u.last_name, u.login, u.email, ua.country, ua.city, ua.street, ua.house_number, ua.zip_code " +
                 "FROM users u " +
                 "JOIN user_addresses ua on u.id = ua.user_id " +
@@ -94,23 +97,31 @@ public class UserController {
         return user;
     }
 
-
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public User createUser(@RequestBody User newUser) {
-        long userId = insertUser(newUser);
-        String sql = "INSERT INTO user_addresses(user_id, country, city, street, house_number, zip_code) " +
-                "VALUES(:id, :country, :city, :street, :houseNumber, :zipCode)";
+        // TODO: Validate email
+        boolean emailExists = false;
+
+        String sql = "select exists(select 1 from users where email = :email)";
         HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("email",newUser.email);
 
-        parameters.put("id",userId);
-        Address address = newUser.address;
-        parameters.put("country", address.country);
-        parameters.put("city", address.city);
-        parameters.put("street", address.street);
-        parameters.put("houseNumber", address.houseNumber);
-        parameters.put("zipCode", address.zipCode);
+        RowMapper<Boolean> rowMapper = new RowMapper<>() {
+            @Override
+            public Boolean mapRow(ResultSet rs, int rowNum) throws SQLException {
+                boolean isEmailExisting = rs.getBoolean(1);
+                return isEmailExisting;
+            }
+        };
 
-        jdbcTemplate.update(sql, parameters);
+        emailExists = jdbcTemplate.queryForObject(sql, parameters, rowMapper);
+
+        if (emailExists) {
+            throw new EmailExistsException();
+        }
+
+        long userId = insertUser(newUser);
+        Address address = insertUserAdress(newUser, userId);
 
         return new User(
                 userId,
@@ -120,6 +131,23 @@ public class UserController {
                 newUser.email,
                 address
         );
+    }
+
+    private Address insertUserAdress(User newUser, long userId) {
+        String sql = "INSERT INTO user_addresses(user_id, country, city, street, house_number, zip_code) " +
+                "VALUES(:id, :country, :city, :street, :houseNumber, :zipCode)";
+        HashMap<String, Object> parameters = new HashMap<>();
+
+        parameters.put("id", userId);
+        Address address = newUser.address;
+        parameters.put("country", address.country);
+        parameters.put("city", address.city);
+        parameters.put("street", address.street);
+        parameters.put("houseNumber", address.houseNumber);
+        parameters.put("zipCode", address.zipCode);
+
+        jdbcTemplate.update(sql, parameters);
+        return address;
     }
 
     private long insertUser(User newUser) {
@@ -177,6 +205,11 @@ public class UserController {
     public void deleteUser(@PathVariable long id){
         deleteUserAddresses(id);
         deleteUsers(id);
+    }
+
+    @ExceptionHandler(EmailExistsException.class)
+    private ResponseEntity<?> handleEmailExistsException(EmailExistsException e) {
+        return new ResponseEntity<>("EMAIL_EXISTS", HttpStatus.BAD_REQUEST);
     }
 
     private void deleteUserAddresses(long id) {

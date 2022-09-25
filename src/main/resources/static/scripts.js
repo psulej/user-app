@@ -169,10 +169,23 @@ function addUser() {
             }
         })
     })
-        .then(res => res.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { return Promise.reject(text) })
+            } else {
+                return response.json();
+            }
+        })
         .then(user => {
             let userTableBodyElement = document.getElementById('usersBody')
             let tableHtml = userTableBodyElement.innerHTML + userRow(user)
             userTableBodyElement.innerHTML = tableHtml
+        })
+        .catch(error => {
+            if (error === 'EMAIL_EXISTS') {
+                console.log('Email exists, try different one :(')
+            } else {
+                console.error('Error occurred', error)
+            }
         })
 }
