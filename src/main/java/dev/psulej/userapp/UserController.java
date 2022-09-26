@@ -3,7 +3,6 @@ package dev.psulej.userapp;
 import java.sql.*;
 import java.util.*;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.RowMapper;
@@ -99,24 +98,15 @@ public class UserController {
 
     @RequestMapping(value = "/users", method = RequestMethod.POST)
     public User createUser(@RequestBody User newUser) {
-        // TODO: Validate email
-        boolean emailExists = false;
 
-        String sql = "select exists(select 1 from users where email = :email)";
-        HashMap<String, Object> parameters = new HashMap<>();
-        parameters.put("email",newUser.email);
-
-        RowMapper<Boolean> rowMapper = new RowMapper<>() {
-            @Override
-            public Boolean mapRow(ResultSet rs, int rowNum) throws SQLException {
-                boolean isEmailExisting = rs.getBoolean(1);
-                return isEmailExisting;
-            }
-        };
-
-        emailExists = jdbcTemplate.queryForObject(sql, parameters, rowMapper);
+        boolean emailExists = validateEmail(newUser.email);
+        boolean loginExists = validateLogin(newUser.login);
 
         if (emailExists) {
+            throw new EmailExistsException();
+        }
+
+        if (loginExists) {
             throw new EmailExistsException();
         }
 
@@ -132,6 +122,85 @@ public class UserController {
                 address
         );
     }
+
+    private boolean validateEmail(String email) {
+        boolean emailExists = false;
+
+        String sql = "select exists(select 1 from users where email = :email)";
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("email", email);
+
+        RowMapper<Boolean> rowMapper = new RowMapper<>() {
+            @Override
+            public Boolean mapRow(ResultSet rs, int rowNum) throws SQLException {
+                boolean isEmailExisting = rs.getBoolean(1);
+                return isEmailExisting;
+            }
+        };
+
+        emailExists = jdbcTemplate.queryForObject(sql, parameters, rowMapper);
+        return emailExists;
+    }
+
+    private boolean validateLogin(String login) {
+        boolean loginExists = false;
+
+        String sql = "select exists(select 1 from users where login = :login)";
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("login", login);
+
+        RowMapper<Boolean> rowMapper = new RowMapper<>() {
+            @Override
+            public Boolean mapRow(ResultSet rs, int rowNum) throws SQLException {
+                boolean isLoginExisting = rs.getBoolean(1);
+                return isLoginExisting;
+            }
+        };
+
+        loginExists = jdbcTemplate.queryForObject(sql, parameters, rowMapper);
+        return loginExists;
+    }
+
+    private boolean validateEmailForUpdate(long id,String email) {
+        boolean emailExists = false;
+
+        String sql = "select exists(select 1 from users where email = :email AND id != :id)";
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("email", email);
+        parameters.put("id", id);
+
+        RowMapper<Boolean> rowMapper = new RowMapper<>() {
+            @Override
+            public Boolean mapRow(ResultSet rs, int rowNum) throws SQLException {
+                boolean isEmailExisting = rs.getBoolean(1);
+                return isEmailExisting;
+            }
+        };
+
+        emailExists = jdbcTemplate.queryForObject(sql, parameters, rowMapper);
+        return emailExists;
+    }
+
+    private boolean validateLoginForUpdate(long id,String login) {
+        boolean loginExists = false;
+
+        String sql = "select exists(select 1 from users where login = :login AND id != :id)";
+        HashMap<String, Object> parameters = new HashMap<>();
+        parameters.put("login", login);
+        parameters.put("id", id);
+
+        RowMapper<Boolean> rowMapper = new RowMapper<>() {
+            @Override
+            public Boolean mapRow(ResultSet rs, int rowNum) throws SQLException {
+                boolean isLoginExisting = rs.getBoolean(1);
+                return isLoginExisting;
+            }
+        };
+
+        loginExists = jdbcTemplate.queryForObject(sql, parameters, rowMapper);
+        return loginExists;
+    }
+
 
     private Address insertUserAdress(User newUser, long userId) {
         String sql = "INSERT INTO user_addresses(user_id, country, city, street, house_number, zip_code) " +
@@ -167,11 +236,23 @@ public class UserController {
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
     public User updateUser(@PathVariable long id, @RequestBody User existingUser) {
-        long userId = setUser(id, existingUser);
+
+        boolean emailExists = validateEmailForUpdate(id,existingUser.email);
+        boolean loginExists = validateLoginForUpdate(id,existingUser.login);
+
+        if (emailExists) {
+            throw new EmailExistsException();
+        }
+
+        if (loginExists) {
+            throw new EmailExistsException();
+        }
+
+        setUser(id,existingUser);
         String sql = "UPDATE user_addresses SET country = :country, city = :city, street = :street, house_number = :houseNumber, zip_code = :zipCode WHERE user_id = :id";
         HashMap<String, Object> parameters = new HashMap<>();
         Address address = existingUser.address;
-        parameters.put("id",userId);
+        parameters.put("id",id);
         parameters.put("country",existingUser.address.country);
         parameters.put("city",existingUser.address.city);
         parameters.put("street",existingUser.address.street);
@@ -188,7 +269,7 @@ public class UserController {
         );
     }
 
-    private long setUser(long id, User existingUser) {
+    private void setUser(long id, User existingUser) {
         String sql = "UPDATE users SET first_name = :firstName, last_name = :lastName, login = :login, email = :email WHERE id = :id";
         HashMap<String, Object> parameters = new HashMap<>();
         parameters.put("firstName", existingUser.firstName);
@@ -196,9 +277,7 @@ public class UserController {
         parameters.put("id", id);
         parameters.put("email", existingUser.email);
         parameters.put("login", existingUser.login);
-        KeyHolder key = new GeneratedKeyHolder();
-        jdbcTemplate.update(sql, new MapSqlParameterSource(parameters), key, new String[] { "id" });
-        return key.getKey().longValue();
+        jdbcTemplate.update(sql, new MapSqlParameterSource(parameters));
     }
 
     @RequestMapping(value = "/users/{id}" , method = RequestMethod.DELETE)
@@ -210,6 +289,11 @@ public class UserController {
     @ExceptionHandler(EmailExistsException.class)
     private ResponseEntity<?> handleEmailExistsException(EmailExistsException e) {
         return new ResponseEntity<>("EMAIL_EXISTS", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(LoginExistsException.class)
+    private ResponseEntity<?> handleLoginExistsException(EmailExistsException e) {
+        return new ResponseEntity<>("LOGIN_EXISTS", HttpStatus.BAD_REQUEST);
     }
 
     private void deleteUserAddresses(long id) {

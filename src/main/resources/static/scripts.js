@@ -68,20 +68,31 @@ function updateUser(userId) {
             }
         })
     })
-
-        .then(res => {
-            console.log(res)
-            if (res.ok) {
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { return Promise.reject(text) })
+            } else {
+                return response.json();
+            }
+        })
+        .then(user => {
                 // wyswietlanie w tabelce
                 const row = document.getElementById(`user-${userId}`)
-                row.querySelector('.firstName').innerHTML = newFirstName
-                row.querySelector('.lastName').innerHTML = newLastName
+                row.querySelector('.firstName').innerHTML = user.firstName
+                row.querySelector('.lastName').innerHTML = user.lastName
+        })
+        .catch(error => {
+            if (error === 'EMAIL_EXISTS') {
+                console.log('Email exists, try different one :(')
+            } else if (error === 'LOGIN_EXISTS') {
+                console.log('Login exists, try different one :(')
+            } else {
+                console.error('Error occurred', error)
             }
         })
 }
 
 function openForm(userId) {
-
     fetch(`http://localhost:9000/users/${userId}`, {
         method: 'GET',
         headers: {
@@ -105,6 +116,8 @@ function openForm(userId) {
             updateUserForm.querySelector('#newZipCode').value = res.address.zipCode
             updateUserForm.style.display = "block"
             const submitButton = updateUserForm.querySelector('button[type="submit"]')
+            submitButton.removeEventListener("click", function (e) {
+            }, true)
             submitButton.addEventListener("click", function() {
                 updateUser(userId)
             })
@@ -184,7 +197,11 @@ function addUser() {
         .catch(error => {
             if (error === 'EMAIL_EXISTS') {
                 console.log('Email exists, try different one :(')
-            } else {
+            }
+            if (error === 'LOGIN_EXISTS') {
+                console.log('Login exists, try different one :(')
+            }
+            else {
                 console.error('Error occurred', error)
             }
         })
