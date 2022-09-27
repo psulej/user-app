@@ -74,6 +74,11 @@ input[type='text'] { font-size: 15px; }
     margin-left: auto;
 }
 
+.red {
+    color: red;
+    visibility: hidden;
+}
+
 .formInput{
     font-size: 20px;
 }
@@ -148,4 +153,5 @@ input[type='text'] { font-size: 15px; }
 .form-container .btn:hover, .open-button:hover {
   opacity: 1;
 }
+
 

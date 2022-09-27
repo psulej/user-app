@@ -11,6 +11,8 @@ fetch('http://localhost:9000/users')
         document.getElementById('usersBody').innerHTML = tableHtml
     })
 
+
+
 function userRow(user) {
 
     const userId = user.id
@@ -116,11 +118,12 @@ function openForm(userId) {
             updateUserForm.querySelector('#newZipCode').value = res.address.zipCode
             updateUserForm.style.display = "block"
             const submitButton = updateUserForm.querySelector('button[type="submit"]')
-            submitButton.removeEventListener("click", function (e) {
-            }, true)
-            submitButton.addEventListener("click", function() {
+
+            let newSubmitButton = submitButton.cloneNode(true);
+            newSubmitButton.addEventListener("click", function() {
                 updateUser(userId)
             })
+            submitButton.replaceWith(newSubmitButton); // usuniecie starych event listenerów
         })
 }
 
@@ -152,7 +155,7 @@ function closeForm(form) {
     document.getElementById(form).style.display = "none";
 }
 
-function addUser() {
+function validateInputs(){
     const userName = document.getElementById("name");
     const userLastName = document.getElementById("lastName");
     const userLogin = document.getElementById("login");
@@ -162,6 +165,46 @@ function addUser() {
     const userStreet = document.getElementById("street");
     const userHouseNumber = document.getElementById("houseNumber");
     const userZipCode = document.getElementById("zipCode");
+
+    const nameRegex = /^[a-zA-Z ]{1,50}$/
+    const loginRegex = /^[\w.-]{0,19}[0-9a-zA-Z]$/;
+    const emailRegex = /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/;
+    const countryRegex = /^[a-zA-Z ]{4,56}$/
+    const cityRegex = /^([a-zA-Z\u0080-\u024F]+(?:. |-| |'))*[a-zA-Z\u0080-\u024F]*$/
+    const streetRegex = /^(\\d{1,}) [a-zA-Z0-9\\s]+(\\,)? [a-zA-Z]+(\\,)? [A-Z]{2} [0-9]{5,6}$/
+    const houseNumberRegex = /^[0-9]+$/
+    const zipCodeRegex = /^[0-9]{5}(?:-[0-9]{4})?$/
+
+    const nameErrorAlert = document.getElementById('nameError');
+    const lastNameErrorAlert = document.getElementById('lastNameError');
+    const loginErrorAlert = document.getElementById('loginError');
+    const emailErrorAlert = document.getElementById('emailError');
+    const countryErrorAlert = document.getElementById('countryError');
+    const cityErrorAlert = document.getElementById('cityError');
+    const streetErrorAlert = document.getElementById('streetError');
+    const houseNumberErrorAlert = document.getElementById('houseNumberError');
+    const zipCodeErrorAlert = document.getElementById('zipCodeError');
+
+    let userNameValue= userName.value;
+    if(userNameValue == null || userNameValue.length === 0) {
+        nameErrorAlert.hidden = false
+    }
+}
+
+function addUser() {
+
+    validateInputs()
+
+    const userName = document.getElementById("name");
+    const userLastName = document.getElementById("lastName");
+    const userLogin = document.getElementById("login");
+    const userEmail = document.getElementById("email");
+    const userCountry = document.getElementById("country");
+    const userCity = document.getElementById("city");
+    const userStreet = document.getElementById("street");
+    const userHouseNumber = document.getElementById("houseNumber");
+    const userZipCode = document.getElementById("zipCode");
+
 
     fetch(`http://localhost:9000/users`, {
         method: 'POST',
