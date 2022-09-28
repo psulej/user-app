@@ -156,39 +156,120 @@ function closeForm(form) {
 }
 
 function validateInputs(){
-    const userName = document.getElementById("name");
-    const userLastName = document.getElementById("lastName");
-    const userLogin = document.getElementById("login");
-    const userEmail = document.getElementById("email");
-    const userCountry = document.getElementById("country");
-    const userCity = document.getElementById("city");
-    const userStreet = document.getElementById("street");
-    const userHouseNumber = document.getElementById("houseNumber");
-    const userZipCode = document.getElementById("zipCode");
 
-    const nameRegex = /^[a-zA-Z ]{1,50}$/
-    const loginRegex = /^[\w.-]{0,19}[0-9a-zA-Z]$/;
-    const emailRegex = /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/;
-    const countryRegex = /^[a-zA-Z ]{4,56}$/
-    const cityRegex = /^([a-zA-Z\u0080-\u024F]+(?:. |-| |'))*[a-zA-Z\u0080-\u024F]*$/
-    const streetRegex = /^(\\d{1,}) [a-zA-Z0-9\\s]+(\\,)? [a-zA-Z]+(\\,)? [A-Z]{2} [0-9]{5,6}$/
-    const houseNumberRegex = /^[0-9]+$/
-    const zipCodeRegex = /^[0-9]{5}(?:-[0-9]{4})?$/
+    const nameValidation = {
+        value: document.getElementById("name").value,
+        regex: /^[a-zA-Z ]{1,50}$/,
+        errorField: document.getElementById('nameError'),
 
-    const nameErrorAlert = document.getElementById('nameError');
-    const lastNameErrorAlert = document.getElementById('lastNameError');
-    const loginErrorAlert = document.getElementById('loginError');
-    const emailErrorAlert = document.getElementById('emailError');
-    const countryErrorAlert = document.getElementById('countryError');
-    const cityErrorAlert = document.getElementById('cityError');
-    const streetErrorAlert = document.getElementById('streetError');
-    const houseNumberErrorAlert = document.getElementById('houseNumberError');
-    const zipCodeErrorAlert = document.getElementById('zipCodeError');
-
-    let userNameValue= userName.value;
-    if(userNameValue == null || userNameValue.length === 0) {
-        nameErrorAlert.hidden = false
+        validate: function () {
+            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
+                this.errorField.style.visibility = "visible"
+            }
+        }
     }
+
+    const lastNameValidation = {
+        value: document.getElementById("lastName").value,
+        regex: /^[a-zA-Z ]{1,50}$/,
+        errorField: document.getElementById('lastNameError'),
+
+        validate: function () {
+            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
+                this.errorField.style.visibility = "visible"
+            }
+        }
+    }
+
+    const loginValidation = {
+        value: document.getElementById("login").value,
+        regex: /^[\w.-]{0,19}[0-9a-zA-Z]$/,
+        errorField: document.getElementById('loginError'),
+
+        validate: function () {
+            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
+                this.errorField.style.visibility = "visible"
+            }
+        }
+    }
+
+    const emailValidation = {
+        value: document.getElementById("email").value,
+        regex: /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/,
+        errorField: document.getElementById('emailError'),
+
+        validate: function () {
+            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
+                this.errorField.style.visibility = "visible"
+            }
+        }
+    }
+
+    const countryValidation = {
+        value: document.getElementById("country").value,
+        regex: /^[a-zA-Z ]{4,56}$/,
+        errorField: document.getElementById('countryError'),
+
+        validate: function () {
+            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
+                this.errorField.style.visibility = "visible"
+            }
+        }
+    }
+
+    const cityValidation = {
+        value: document.getElementById("city").value,
+        regex: /^([a-zA-Z\u0080-\u024F]+(?:. |-| |'))*[a-zA-Z\u0080-\u024F]*$/,
+        errorField: document.getElementById('cityError'),
+
+        validate: function () {
+            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
+                this.errorField.style.visibility = "visible"
+            }
+        }
+    }
+
+    const streetValidation = {
+        value: document.getElementById("street").value,
+        regex: /^(\\d{1,}) [a-zA-Z0-9\\s]+(\\,)? [a-zA-Z]+(\\,)? [A-Z]{2} [0-9]{5,6}$/,
+        errorField: document.getElementById('streetError'),
+
+        validate: function () {
+            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
+                this.errorField.style.visibility = "visible"
+            }
+        }
+    }
+
+    const houseNumberValidation = {
+        value: document.getElementById("houseNumber").value,
+        regex: /^[0-9]+$/,
+        errorField: document.getElementById('houseNumberError'),
+
+        validate: function () {
+            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
+                this.errorField.style.visibility = "visible"
+            }
+        }
+    }
+
+    const userZipCode = {
+        value: document.getElementById("zipCode").value,
+        regex: /^[0-9]{5}(?:-[0-9]{4})?$/,
+        errorField: document.getElementById('zipCodeError'),
+
+        validate: function () {
+            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
+                this.errorField.style.visibility = "visible"
+            }
+        }
+    }
+
+    const validations = [
+        nameValidation,lastNameValidation,loginValidation,emailValidation,countryValidation,cityValidation,streetValidation,houseNumberValidation,userZipCode
+    ]
+
+    validations.forEach(validation => validation.validate())
 }
 
 function addUser() {
