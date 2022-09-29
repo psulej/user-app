@@ -11,8 +11,6 @@ fetch('http://localhost:9000/users')
         document.getElementById('usersBody').innerHTML = tableHtml
     })
 
-
-
 function userRow(user) {
 
     const userId = user.id
@@ -157,124 +155,99 @@ function closeForm(form) {
 
 function validateInputs(){
 
-    const nameValidation = {
-        value: document.getElementById("name").value,
-        regex: /^[a-zA-Z ]{1,50}$/,
-        errorField: document.getElementById('nameError'),
-
-        validate: function () {
-            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
-                this.errorField.style.visibility = "visible"
-            }
-        }
+    const Validation = function (value, regex, errorField) {
+        this.value = value
+        this.regex = regex
+        this.errorField = errorField
     }
 
-    const lastNameValidation = {
-        value: document.getElementById("lastName").value,
-        regex: /^[a-zA-Z ]{1,50}$/,
-        errorField: document.getElementById('lastNameError'),
-
-        validate: function () {
-            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
-                this.errorField.style.visibility = "visible"
-            }
-        }
+    Validation.prototype.validate = function() {
+        return (this.value != null && this.value.length > 0) && this.regex.test(this.value)
+    }
+    Validation.prototype.showError = function() {
+        this.errorField.style.visibility = "visible";
+    }
+    Validation.prototype.hideError = function () {
+        this.errorField.style.visibility = "hidden";
     }
 
-    const loginValidation = {
-        value: document.getElementById("login").value,
-        regex: /^[\w.-]{0,19}[0-9a-zA-Z]$/,
-        errorField: document.getElementById('loginError'),
+    const nameValidation = new Validation(
+        document.getElementById("name").value,
+        /^[a-zA-Z ]{1,50}$/,
+        document.getElementById('nameError')
+    )
 
-        validate: function () {
-            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
-                this.errorField.style.visibility = "visible"
-            }
-        }
-    }
+    const lastNameValidation = new Validation(
+        document.getElementById("lastName").value,
+        /^[a-zA-Z ]{1,50}$/,
+        document.getElementById('lastNameError')
+    )
 
-    const emailValidation = {
-        value: document.getElementById("email").value,
-        regex: /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/,
-        errorField: document.getElementById('emailError'),
+    const loginValidation = new Validation(
+        document.getElementById("login").value,
+        /^[\w.-]{0,19}[0-9a-zA-Z]$/,
+        document.getElementById('loginError')
+    )
 
-        validate: function () {
-            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
-                this.errorField.style.visibility = "visible"
-            }
-        }
-    }
+    const emailValidation = new Validation(
+        document.getElementById("email").value,
+        /^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-]+)+/,
+        document.getElementById('emailError')
+    )
 
-    const countryValidation = {
-        value: document.getElementById("country").value,
-        regex: /^[a-zA-Z ]{4,56}$/,
-        errorField: document.getElementById('countryError'),
+    const countryValidation = new Validation(
+        document.getElementById("country").value,
+        /^[a-zA-Z ]{4,56}$/,
+        document.getElementById('countryError')
+    )
 
-        validate: function () {
-            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
-                this.errorField.style.visibility = "visible"
-            }
-        }
-    }
+    const cityValidation = new Validation(
+        document.getElementById("city").value,
+        /^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$/,
+        document.getElementById('cityError')
+    )
 
-    const cityValidation = {
-        value: document.getElementById("city").value,
-        regex: /^([a-zA-Z\u0080-\u024F]+(?:. |-| |'))*[a-zA-Z\u0080-\u024F]*$/,
-        errorField: document.getElementById('cityError'),
+    const streetValidation = new Validation(
+        document.getElementById("street").value,
+        /^(\\d{1,}) [a-zA-Z0-9\\s]+(\\,)? [a-zA-Z]+(\\,)? [A-Z]{2} [0-9]{5,6}$/,
+        document.getElementById('streetError')
+    )
 
-        validate: function () {
-            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
-                this.errorField.style.visibility = "visible"
-            }
-        }
-    }
+    const houseNumberValidation = new Validation(
+        document.getElementById("houseNumber").value,
+        /^[0-9]+$/,
+        document.getElementById('houseNumberError')
+    )
 
-    const streetValidation = {
-        value: document.getElementById("street").value,
-        regex: /^(\\d{1,}) [a-zA-Z0-9\\s]+(\\,)? [a-zA-Z]+(\\,)? [A-Z]{2} [0-9]{5,6}$/,
-        errorField: document.getElementById('streetError'),
-
-        validate: function () {
-            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
-                this.errorField.style.visibility = "visible"
-            }
-        }
-    }
-
-    const houseNumberValidation = {
-        value: document.getElementById("houseNumber").value,
-        regex: /^[0-9]+$/,
-        errorField: document.getElementById('houseNumberError'),
-
-        validate: function () {
-            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
-                this.errorField.style.visibility = "visible"
-            }
-        }
-    }
-
-    const userZipCode = {
-        value: document.getElementById("zipCode").value,
-        regex: /^[0-9]{5}(?:-[0-9]{4})?$/,
-        errorField: document.getElementById('zipCodeError'),
-
-        validate: function () {
-            if (((value == null || value.length === 0)) || this.regex.test(value) === false) {
-                this.errorField.style.visibility = "visible"
-            }
-        }
-    }
+    const zipCodeValidation = new Validation(
+        document.getElementById("zipCode").value,
+        /^[a-z0-9][a-z0-9\- ]{0,10}[a-z0-9]$/,
+        document.getElementById('zipCodeError')
+    )
 
     const validations = [
-        nameValidation,lastNameValidation,loginValidation,emailValidation,countryValidation,cityValidation,streetValidation,houseNumberValidation,userZipCode
+        nameValidation,lastNameValidation,loginValidation,emailValidation,countryValidation,cityValidation,streetValidation,houseNumberValidation,zipCodeValidation
     ]
 
-    validations.forEach(validation => validation.validate())
+    let valid = true
+    validations.forEach(validation => {
+            if (validation.validate()) {
+                validation.hideError()
+            } else {
+                validation.showError()
+                valid = false
+            }
+        }
+    )
+    return valid
 }
 
 function addUser() {
 
-    validateInputs()
+    if (!validateInputs()) {
+        console.log('Form is invalid')
+        return
+    }
 
     const userName = document.getElementById("name");
     const userLastName = document.getElementById("lastName");
