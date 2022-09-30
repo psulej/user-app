@@ -21,7 +21,7 @@
 
           <tr class="red" id="nameError">
             <td colspan="2">
-              Name is required
+              Name is invalid
             </td>
           </tr>
 
@@ -34,7 +34,7 @@
 
           <tr class="red" id="lastNameError">
             <td colspan="2">
-              Last name is required
+              Last name is invalid
             </td>
           </tr>
 
@@ -47,7 +47,7 @@
 
           <tr class="red" id="loginError">
             <td colspan="2">
-              Login is required
+              Login is invalid
             </td>
           </tr>
 
@@ -60,7 +60,7 @@
 
           <tr class="red" id="emailError">
             <td colspan="2">
-              Email is required
+              <p>Email is invalid</p>
             </td>
           </tr>
 
@@ -73,7 +73,7 @@
 
           <tr class="red" id="countryError">
             <td colspan="2">
-              Country is required
+              Country is invalid
             </td>
           </tr>
 
@@ -86,7 +86,7 @@
 
           <tr class="red" id="cityError">
             <td colspan="2">
-              City is required
+              City is invalid
             </td>
           </tr>
 
@@ -99,7 +99,7 @@
 
           <tr class="red" id="streetError">
             <td colspan="2">
-              Street is required
+              Street is invalid
             </td>
           </tr>
 
@@ -112,7 +112,7 @@
 
           <tr class="red" id="houseNumberError">
             <td colspan="2">
-              House number is required
+              House number is invalid
             </td>
           </tr>
 
@@ -125,22 +125,29 @@
 
           <tr class="red" id="zipCodeError">
             <td colspan="2">
-              Zip code is required
+              Zip code is invalid
             </td>
           </tr>
 
           <tr>
-            <td colspan="2" style="width:40%; font-size: 40px; text-align: center; height: 90px"><button onclick="addUser()" id="addUserButton">Click to add</button></td>
+            <td colspan="2" style="width:40%; font-size: 40px; text-align: center; height: 90px"><button onclick="addUser()" class="buttonStyle" id="addUserButton">Click to add</button></td>
           </tr>
 
           <td colspan="2" style="visibility: hidden">123</td>
 
-          <tr>
-            <td colspan="2" style="width:40%; font-size: 40px; text-align: center; height: 90px">
-              <label for="search"></label><input class="userDataInput" id="search" type="text"></td>
-          </tr>
         </tbody>
         </table>
+
+      <div style="padding-top: 30px; width: 100%;">
+        <div class="userDataField">Search by name:</div>
+        <div class="userDataField" style="padding-top: 10px; padding-bottom: 10px";>
+          <label for="search"></label><input style="width: 243px;" id="search" type="text">
+        </div>
+        <div>
+          <button style="width: 243px; height: 56px; font-size: 24px;border-radius: 12px"
+                  onclick=""  id="searchButton" >Search</button></div>
+      </div>
+
     </div>
 
     <div style="padding-top: 40px;">
