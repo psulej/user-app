@@ -11,6 +11,29 @@ fetch('http://localhost:9000/users')
         document.getElementById('usersBody').innerHTML = tableHtml
     })
 
+function searchByFirstName(){
+    let select = document.getElementById('sortOptions');
+    let selectedSortOption = select.options[select.selectedIndex].value;
+
+    const getSearch = document.getElementById('search').value;
+
+    fetch(`http://localhost:9000/users/?${selectedSortOption}=${getSearch}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+        .then(res => res.json())
+        .then(res => {
+            let tableHtml = ''
+            for (let index in res) {
+                const user = res[index]
+                tableHtml += userRow(user)
+            }
+            document.getElementById('usersBody').innerHTML = tableHtml
+        })
+}
+
 function userRow(user) {
 
     const userId = user.id
@@ -209,7 +232,7 @@ function validateInputs(){
 
     const streetValidation = new Validation(
         document.getElementById("street").value,
-        /^(\\d{1,}) [a-zA-Z0-9\\s]+(\\,)? [a-zA-Z]+(\\,)? [A-Z]{2} [0-9]{5,6}$/,
+        /[a-zA-Z]*/,
         document.getElementById('streetError')
     )
 

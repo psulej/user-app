@@ -139,13 +139,18 @@
         </table>
 
       <div style="padding-top: 30px; width: 100%;">
-        <div class="userDataField">Search by name:</div>
+        <label for="sortOptions">Search by:</label>
+
+        <select name="sortOptions" id="sortOptions">
+          <option id="sortByName" value="firstName">Name</option>
+          <option id="sortByLastName" value="lastName">Last name</option>
+        </select>
         <div class="userDataField" style="padding-top: 10px; padding-bottom: 10px";>
           <label for="search"></label><input style="width: 243px;" id="search" type="text">
         </div>
         <div>
           <button style="width: 243px; height: 56px; font-size: 24px;border-radius: 12px"
-                  onclick=""  id="searchButton" >Search</button></div>
+                  onclick="searchByFirstName()"  id="searchButton" >Search</button></div>
       </div>
 
     </div>
@@ -157,8 +162,6 @@
 
     <tbody id="usersBody">
     </tbody>
-
-    </table>
 
     <!-- Update popup -->
     <div class="form-popup" id="updateForm">
