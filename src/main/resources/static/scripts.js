@@ -1,34 +1,65 @@
-fetch('http://localhost:9000/users')
-    .then(res => res.json())
-    .then(users => {
-        let tableHtml = ''
+let page = 0
+let size = 5
 
-        for (let index in users) {
-            const user = users[index]
-            tableHtml += userRow(user)
-        }
+fetchUsers()
 
-        document.getElementById('usersBody').innerHTML = tableHtml
-    })
+function loadNextPage() {
+    page += 1
+    fetchUsers()
+}
 
-function searchByFirstName(){
+function loadPreviousPage() {
+    page -= 1
+    fetchUsers()
+}
+
+function fetchUsers(){
     const select = document.getElementById('sortOptions');
-    const selectedSortOption = select.options[select.selectedIndex].value;
-    const getSearch = document.getElementById('search').value;
+    const selectedSortOption = select != null ? select.options[select.selectedIndex] : null;
+    const getSearch = document.getElementById('search');
 
-    fetch(`http://localhost:9000/users/?${selectedSortOption}=${getSearch}`, {
+    let url = `http://localhost:9000/users?page=${page}&size=${size}`
+
+    if (selectedSortOption != null && selectedSortOption.value != null) {
+        url += `&${selectedSortOption.value}=${getSearch.value}`
+    }
+
+    fetch(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         },
     })
+
         .then(res => res.json())
         .then(res => {
+            console.log(res);
+            let users = res.items;
             let tableHtml = ''
-            for (let index in res) {
-                const user = res[index]
+            for (let index in users) {
+                const user = users[index]
                 tableHtml += userRow(user)
             }
+
+
+            const previousPageButton = document.getElementById('previousPageButton');
+            const nextPageButton = document.getElementById('nextPageButton');
+
+            const lastPage = res.totalPages-1;
+
+            if(page === lastPage){
+                nextPageButton.disabled = true;
+            }
+            if(page !== lastPage){
+                nextPageButton.disabled = false;
+            }
+            previousPageButton.disabled = page === 0;
+
+            // TO DO
+            // cos takiego zrobic
+            // < [2/100] >
+            // Total: 3243907823
+
             document.getElementById('usersBody').innerHTML = tableHtml
         })
 }

@@ -23,33 +23,33 @@ public class UserController {
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public List<BasicUser> getUsers(
+    public PaginationResponse<BasicUser> getUsers(
         @RequestParam(value = "firstName", required = false) String firstName,
         @RequestParam(value = "lastName", required = false) String lastName,
-        @RequestParam(value = "sort", defaultValue = "id") String sort) {
-
+        @RequestParam(value = "sort", defaultValue = "id") String sort,
+        @RequestParam(value = "page", defaultValue = "0") int page,
+        @RequestParam(value = "size", defaultValue = "10") int size
+        ) {
         String sql = "SELECT id, first_name, last_name, login, email FROM users WHERE 1 = 1";
+        String countSql = "SELECT count(*) FROM users WHERE 1 = 1";
+
         Map<String, Object> parameters = new HashMap<>();
 
         if (firstName != null) {
             sql += " AND lower(first_name) LIKE lower(:firstName)";
+            countSql += " AND lower(first_name) LIKE lower(:firstName)";
             parameters.put("firstName", firstName + '%');
         }
         if (lastName != null) {
             sql += " AND lower(last_name) LIKE lower(:lastName)";
+            countSql += " AND lower(last_name) LIKE lower(:lastName)";
             parameters.put("lastName", lastName + '%');
         }
 
-
-        Map<String, String> orderByColumns = new HashMap<>();
-        orderByColumns.put("id", "id");
-        orderByColumns.put("firstName", "first_name");
-        orderByColumns.put("lastName", "last_name");
-        orderByColumns.put("email", "email");
-        orderByColumns.put("login", "login");
-
-        String sortColumnName = orderByColumns.getOrDefault(sort, "id");
+        String sortColumnName = getOrderByParameter(sort);
         sql += " ORDER BY " + sortColumnName;
+        sql += " LIMIT " + size;
+        sql += " OFFSET  " + page * size;
 
         RowMapper<BasicUser> rowMapper = new RowMapper<>() {
             @Override
@@ -60,9 +60,32 @@ public class UserController {
                 return new BasicUser(id, firstName, lastName);
             }
         };
-        return jdbcTemplate.query(
-                sql, parameters, rowMapper
-        );
+        List<BasicUser> users = jdbcTemplate.query(sql, parameters, rowMapper);
+
+        RowMapper<Long> countRowMapper = new RowMapper<>() {
+            @Override
+            public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
+                return rs.getLong(1);
+            }
+        };
+        Long totalItems = jdbcTemplate.queryForObject(countSql, parameters, countRowMapper);
+
+        long totalPages = (long) (Math.ceil(totalItems / (size * 1.0)));
+        int currentPage = page;
+        PaginationResponse<BasicUser> response = new PaginationResponse<>(totalItems, totalPages, currentPage,users);
+        return response;
+    }
+
+    private static String getOrderByParameter(String sort) {
+        Map<String, String> orderByColumns = new HashMap<>();
+        orderByColumns.put("id", "id");
+        orderByColumns.put("firstName", "first_name");
+        orderByColumns.put("lastName", "last_name");
+        orderByColumns.put("email", "email");
+        orderByColumns.put("login", "login");
+
+        String sortColumnName = orderByColumns.getOrDefault(sort, "id");
+        return sortColumnName;
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
