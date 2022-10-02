@@ -12,9 +12,8 @@ fetch('http://localhost:9000/users')
     })
 
 function searchByFirstName(){
-    let select = document.getElementById('sortOptions');
-    let selectedSortOption = select.options[select.selectedIndex].value;
-
+    const select = document.getElementById('sortOptions');
+    const selectedSortOption = select.options[select.selectedIndex].value;
     const getSearch = document.getElementById('search').value;
 
     fetch(`http://localhost:9000/users/?${selectedSortOption}=${getSearch}`, {
