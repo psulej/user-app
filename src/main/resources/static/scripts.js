@@ -41,7 +41,6 @@ function fetchUsers(){
                 tableHtml += userRow(user)
             }
 
-
             const previousPageButton = document.getElementById('previousPageButton');
             const nextPageButton = document.getElementById('nextPageButton');
 
@@ -60,6 +59,8 @@ function fetchUsers(){
             // < [2/100] >
             // Total: 3243907823
 
+            let pages = ''
+            document.getElementById('listSize').innerHTML = `< [${res.currentPage}/${lastPage}] >`
             document.getElementById('usersBody').innerHTML = tableHtml
         })
 }

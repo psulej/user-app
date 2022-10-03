@@ -28,7 +28,7 @@ public class UserController {
         @RequestParam(value = "lastName", required = false) String lastName,
         @RequestParam(value = "sort", defaultValue = "id") String sort,
         @RequestParam(value = "page", defaultValue = "0") int page,
-        @RequestParam(value = "size", defaultValue = "10") int size
+        @RequestParam(value = "size", defaultValue = "5") int size
         ) {
         String sql = "SELECT id, first_name, last_name, login, email FROM users WHERE 1 = 1";
         String countSql = "SELECT count(*) FROM users WHERE 1 = 1";
