@@ -54,13 +54,8 @@ function fetchUsers(){
             }
             previousPageButton.disabled = page === 0;
 
-            // TO DO
-            // cos takiego zrobic
-            // < [2/100] >
-            // Total: 3243907823
-
             let pages = ''
-            document.getElementById('listSize').innerHTML = `< [${res.currentPage}/${lastPage}] >`
+            document.getElementById('listSize').innerHTML = `[${res.currentPage}/${lastPage}]`
             document.getElementById('usersBody').innerHTML = tableHtml
         })
 }

@@ -81,6 +81,18 @@ input[type='text'] { font-size: 15px; }
     margin-left: auto;
 }
 
+
+.paginationButton {
+    width: 100px;
+    margin: 0 auto;
+    display: inline;
+}
+
+#searchButtons{
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
 .red {
     color: red;
     visibility: hidden;

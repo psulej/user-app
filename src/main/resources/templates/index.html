@@ -155,18 +155,21 @@
 
     </div>
 
-    <div style="padding-top: 40px;">
+    <div style="padding-top: 5px;">
       <h1>Registered users</h1>
     </div>
 
     <table id="usersTable">
       <div id="listSize"></div>
-      <button id="previousPageButton" onclick="loadPreviousPage()">Previous</button>
-      <button id="nextPageButton" onclick="loadNextPage()">Next</button>
 
     <tbody id="usersBody">
     </tbody>
     </table>
+
+    <div id="searchButtons">
+      <button class="paginationButton" id="previousPageButton" onclick="loadPreviousPage()">Previous</button>
+      <button class="paginationButton" id="nextPageButton" onclick="loadNextPage()">Next</button>
+    </div>
 
 
     <!-- Update popup -->
