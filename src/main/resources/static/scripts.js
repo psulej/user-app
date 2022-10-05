@@ -219,6 +219,9 @@ function validateInputs(){
     Validation.prototype.hideError = function () {
         this.errorField.style.visibility = "hidden";
     }
+    Validation.prototype.getValue = function () {
+        return this.value;
+    }
 
     const nameValidation = new Validation(
         document.getElementById("name").value,
@@ -282,12 +285,19 @@ function validateInputs(){
     validations.forEach(validation => {
             if (validation.validate()) {
                 validation.hideError()
+                document.getElementById('inputsError').style.visibility = "hidden"
             } else {
                 validation.showError()
                 valid = false
             }
+        if(validation.getValue() === null || validation.getValue().length === 0){
+                document.getElementById('inputsError').style.visibility = "visible"
+            }
         }
     )
+
+
+
     return valid
 }
 
